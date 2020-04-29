@@ -1,101 +1,162 @@
 package org.kohsuke.args4j;
 
-import org.kohsuke.args4j.ExplicitBooleanArgumentTest.BooleanArgumentHolder;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.kohsuke.args4j.Args4JUtilities.getUsageLines;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.kohsuke.args4j.spi.ExplicitBooleanOptionHandler;
 
-public class ExplicitBooleanArgumentTest extends Args4JTestBase<BooleanArgumentHolder> {
+public class ExplicitBooleanArgumentTest {
+
+    private CmdLineParser parser;
+
+    private BooleanArgumentHolder bah;
 
     public static class BooleanArgumentHolder {
-        @Argument(index = 0, handler = ExplicitBooleanOptionHandler.class, usage = "Set a boolean value")
+        @Argument(index = 0, handler = ExplicitBooleanOptionHandler.class,
+                usage = "Set a boolean value")
         boolean booleanArg;
     }
 
-    @Override
-    public BooleanArgumentHolder getTestObject() {
-        return new BooleanArgumentHolder();
+    @BeforeEach
+    public void setup() {
+        bah = new BooleanArgumentHolder();
+        parser = new CmdLineParser(bah);
     }
 
-    public void testSetBooleanTrue() throws CmdLineException {
-        args = new String[] { "true" };
-        parser.parseArgument(args);
-        assertTrue(testObject.booleanArg);
-    }
-
-    public void testSetBooleanOn() throws CmdLineException {
-        args = new String[] { "on" };
-        parser.parseArgument(args);
-        assertTrue(testObject.booleanArg);
-    }
-    
-    public void testSetBooleanYes() throws CmdLineException {
-        args = new String[] { "yes" };
-        parser.parseArgument(args);
-        assertTrue(testObject.booleanArg);
-    }
-
-    public void testSetBooleanTrueCaseInsensitive() throws CmdLineException {
-        args = new String[] { "tRuE" };
-        parser.parseArgument(args);
-        assertTrue(testObject.booleanArg);
-    }
-    
-    public void testSetBoolean1() throws CmdLineException {
-        args = new String[] { "1" };
-        parser.parseArgument(args);
-        assertTrue(testObject.booleanArg);
-    }
-
-    public void testSetBooleanFalse() throws CmdLineException {
-        args = new String[] { "false" };
-        parser.parseArgument(args);
-        assertFalse(testObject.booleanArg);
-    }
-
-    public void testSetBooleanOff() throws CmdLineException {
-        args = new String[] { "off" };
-        parser.parseArgument(args);
-        assertFalse(testObject.booleanArg);
-    }
-    
-    public void testSetBooleanNo() throws CmdLineException {
-        args = new String[] { "no" };
-        parser.parseArgument(args);
-        assertFalse(testObject.booleanArg);
-    }
-
-    public void testSetBoolean0() throws CmdLineException {
-        args = new String[] { "0" };
-        parser.parseArgument(args);
-        assertFalse(testObject.booleanArg);
-    }
-
-    public void testSetBooleanFalseCaseInsensitive() throws CmdLineException {
-        args = new String[] { "FaLsE" };
-        parser.parseArgument(args);
-        assertFalse(testObject.booleanArg);
-    }
-    
-    public void testSetBooleanNoValueIsFalse() throws CmdLineException {
-        args = new String[0];
-        parser.parseArgument(args);
-        assertFalse(testObject.booleanArg);
-    }
-
-    public void testIllegalBoolean() {
-        args = new String[] { "ILLEGAL_BOOLEAN" };
+    @Test
+    public void testSetBooleanTrue() {
         try {
-            parser.parseArgument(args);
-            fail("Can't set ILLEGAL_BOOLEAN as value.");
-        } catch (CmdLineException expected) {}
-    }
-
-    public void testUsage() {
-        args = new String[] { "-wrong" };
-        try {
-            parser.parseArgument(args);
+            parser.parseArgument(new String[] {"true"});
         } catch (CmdLineException e) {
-            assertUsageContains("Usage message should contain 'VAL'", "VAL");
+            fail(e.getMessage());
         }
+        assertTrue(bah.booleanArg);
+    }
+
+    @Test
+    public void testSetBooleanOn() {
+        try {
+            parser.parseArgument(new String[] {"on"});
+        } catch (CmdLineException e) {
+            fail(e.getMessage());
+        }
+        assertTrue(bah.booleanArg);
+    }
+
+    @Test
+    public void testSetBooleanYes() {
+        try {
+            parser.parseArgument(new String[] {"yes"});
+        } catch (CmdLineException e) {
+            fail(e.getMessage());
+        }
+        assertTrue(bah.booleanArg);
+    }
+
+    @Test
+    public void testSetBooleanTrueCaseInsensitive() {
+        try {
+            parser.parseArgument(new String[] {"tRuE"});
+        } catch (CmdLineException e) {
+            fail(e.getMessage());
+        }
+        assertTrue(bah.booleanArg);
+    }
+
+    @Test
+    public void testSetBoolean1() {
+        try {
+            parser.parseArgument(new String[] {"1"});
+        } catch (CmdLineException e) {
+            fail(e.getMessage());
+        }
+        assertTrue(bah.booleanArg);
+    }
+
+    @Test
+    public void testSetBooleanFalse() {
+        try {
+            parser.parseArgument(new String[] {"false"});
+        } catch (CmdLineException e) {
+            fail(e.getMessage());
+        }
+        assertFalse(bah.booleanArg);
+    }
+
+    @Test
+    public void testSetBooleanOff() {
+        try {
+            parser.parseArgument(new String[] {"off"});
+        } catch (CmdLineException e) {
+            fail(e.getMessage());
+        }
+        assertFalse(bah.booleanArg);
+    }
+
+    @Test
+    public void testSetBooleanNo() {
+        try {
+            parser.parseArgument(new String[] {"no"});
+        } catch (CmdLineException e) {
+            fail(e.getMessage());
+        }
+        assertFalse(bah.booleanArg);
+    }
+
+    @Test
+    public void testSetBoolean0() {
+        try {
+            parser.parseArgument(new String[] {"0"});
+        } catch (CmdLineException e) {
+            fail(e.getMessage());
+        }
+        assertFalse(bah.booleanArg);
+    }
+
+    @Test
+    public void testSetBooleanFalseCaseInsensitive() {
+        try {
+            parser.parseArgument(new String[] {"FaLsE"});
+        } catch (CmdLineException e) {
+            fail(e.getMessage());
+        }
+        assertFalse(bah.booleanArg);
+    }
+
+    @Test
+    public void testSetBooleanNoValueIsFalse() {
+        try {
+            parser.parseArgument(new String[0]);
+        } catch (CmdLineException e) {
+            fail(e.getMessage());
+        }
+        assertFalse(bah.booleanArg);
+    }
+
+    @Test
+    public void testIllegalBoolean() {
+        assertThrows(CmdLineException.class,
+                () -> parser.parseArgument(new String[] {"ILLEGAL_BOOLEAN"}));
+    }
+
+    @Test
+    public void testUsage() {
+        assertThrows(CmdLineException.class,
+                () -> parser.parseArgument(new String[] {"-wrong"}));
+        var usageLines = getUsageLines(parser);
+        var containsVal = false;
+		for (var usageLine : usageLines) {
+			containsVal = usageLine.contains("VAL");
+			if (containsVal) {
+				break;
+			}
+		}
+        assertTrue(containsVal);
     }
 
 }

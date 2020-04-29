@@ -15,12 +15,14 @@ public class OptionDef {
 	private final boolean help;
 	private final boolean hidden;
 	private final boolean multiValued;
+	@SuppressWarnings("rawtypes")
 	private final Class<? extends OptionHandler> handler;
 
 	public OptionDef(Argument a, boolean forceMultiValued) {
 		this(a.usage(), a.metaVar(), a.required(), false, a.hidden(), a.handler(), a.multiValued() || forceMultiValued);
 	}
 
+	@SuppressWarnings("rawtypes")
 	protected OptionDef(String usage, String metaVar, boolean required,
             boolean help, boolean hidden, 
             Class<? extends OptionHandler> handler,
@@ -57,6 +59,7 @@ public class OptionDef {
 		return hidden;
 	}
 
+    @SuppressWarnings("rawtypes")
 	public Class<? extends OptionHandler> handler() {
 		return handler;
 	}

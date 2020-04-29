@@ -14,6 +14,7 @@ import java.util.List;
  *
  * @author Kohsuke Kawaguchi
  */
+@SuppressWarnings("rawtypes")
 final class MultiValueFieldSetter implements Getter, Setter {
     private final Object bean;
     private final Field f;
@@ -64,6 +65,7 @@ final class MultiValueFieldSetter implements Getter, Setter {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void doAddValue(Object bean, Object value) throws IllegalAccessException {
         Object o = f.get(bean);
         if(o==null) {
@@ -72,10 +74,10 @@ final class MultiValueFieldSetter implements Getter, Setter {
         }
         if(!(o instanceof List))
             throw new IllegalAnnotationError(Messages.ILLEGAL_LIST.format(f));
-
         ((List)o).add(value);
     }
-
+    
+    @SuppressWarnings("unchecked")
     public List<Object> getValueList() {
         try {
             f.setAccessible(true);

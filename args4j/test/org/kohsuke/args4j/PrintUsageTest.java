@@ -1,36 +1,42 @@
 package org.kohsuke.args4j;
 
-public class PrintUsageTest extends Args4JTestBase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.kohsuke.args4j.Args4JUtilities.getUsageLines;
 
-	private class Bean {
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+public class PrintUsageTest {
+
+	private Bean testObject;
+
+	private CmdLineParser parser;
+
+	private static class Bean {
 		@Option(name = "s", usage = "1234567890123456789012345678901234567890")
 		public String s;
 	}
 
-	@Override
-	public Object getTestObject() {
-		return new Bean();
+	@BeforeEach
+	public void setup() {
+		testObject = new Bean();
+		parser = new CmdLineParser(testObject);
 	}
 
+	@Test
 	public void testEnoughLength() {
-		String[] args = { "-wrong" };
-		try {
-			parser.parseArgument(args);
-		} catch (CmdLineException e) {
-			String[] usageMessage = getUsageMessage();
-			assertEquals("Shouldn't split the lines.", 1, usageMessage.length);
-		}
+		assertThrows(CmdLineException.class, () -> parser.parseArgument(new String[] {"-wrong"}));
+		var usageMessage = getUsageLines(parser);
+		assertEquals(1, usageMessage.length);
 	}
 
+	@Test
 	public void testTooSmallLength() {
-		String[] args = { "-wrong" };
-		try {
-			parser.setUsageWidth(30);
-			parser.parseArgument(args);
-		} catch (CmdLineException e) {
-			String[] usageMessage = getUsageMessage();
-			assertEquals("Should split the lines.", 2, usageMessage.length);
-		}
+		parser = new CmdLineParser(testObject, ParserProperties.defaults().withUsageWidth(30));
+		assertThrows(CmdLineException.class, () -> parser.parseArgument(new String[] {"-wrong"}));
+		var usageMessage = getUsageLines(parser);
+		assertEquals(2, usageMessage.length);
 	}
 
 }

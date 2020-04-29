@@ -135,7 +135,9 @@ public abstract class OptionHandler<T> {
      */
     public String printDefaultValue() {
         if (setter instanceof Getter) {
+            @SuppressWarnings("rawtypes")
             Getter getter = (Getter)setter;
+            @SuppressWarnings("unchecked")
             List<T> defaultValues = getter.getValueList();
             if (defaultValues != null && !defaultValues.isEmpty()) {
                 StringBuilder buf = new StringBuilder();

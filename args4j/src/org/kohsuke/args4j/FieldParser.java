@@ -11,6 +11,7 @@ import org.kohsuke.args4j.spi.Setters;
  * @author Jan Materne
  *
  */
+@SuppressWarnings("rawtypes")
 public class FieldParser {
 
 	public void parse(CmdLineParser parser, Object bean) throws ClassNotFoundException {

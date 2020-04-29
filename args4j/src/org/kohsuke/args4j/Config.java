@@ -4,18 +4,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import org.kohsuke.args4j.spi.ConfigElement;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 
 /**
- * Metadataconfiguration.
- * This class holds all metadata for a class, mainly a list of @Options and @Arguments.
+ * Metadataconfiguration. This class holds all metadata for a class, mainly a list of @Options
+ * and @Arguments.
  *
  * @author Jan Materne
  */
@@ -30,6 +32,7 @@ public class Config {
 
 	/**
 	 * SAX-Handler for reading the configuration file.
+	 * 
 	 * @author Jan Materne
 	 */
 	public class ConfigHandler extends DefaultHandler {
@@ -42,8 +45,8 @@ public class Config {
 		ConfigElement currentCE;
 
 		@Override
-		public void startElement(String uri, String localName, String qName,
-				Attributes attributes) throws SAXException {
+		public void startElement(String uri, String localName, String qName, Attributes attributes)
+				throws SAXException {
 			if (qName.equals("option") || qName.equals("argument")) {
 				currentCE = new ConfigElement();
 				currentCE.field = attributes.getValue("field");
@@ -57,7 +60,7 @@ public class Config {
 				if (attributes.getValue("aliases") != null) {
 					currentCE.aliases = attributes.getValue("aliases").split(",");
 				} else {
-					currentCE.aliases = new String[]{};
+					currentCE.aliases = new String[] {};
 				}
 				(qName.equals("option") ? config.options : config.arguments).add(currentCE);
 			}
@@ -66,17 +69,20 @@ public class Config {
 
 	/**
 	 * Parses a XML file and returns a Config object holding the information.
+	 * 
 	 * @param xml source of the xml data
 	 * @return
 	 * @throws IOException
 	 * @throws SAXException
+	 * @throws ParserConfigurationException
 	 */
-	public static Config parse(InputSource xml) throws IOException, SAXException {
+	public static Config parse(InputSource xml)
+			throws IOException, SAXException, ParserConfigurationException {
 		Config rv = new Config();
-		XMLReader reader = XMLReaderFactory.createXMLReader();
+		// XMLReader reader = XMLReaderFactory.createXMLReader();
+		SAXParser reader = SAXParserFactory.newInstance().newSAXParser();
 		ConfigHandler handler = rv.new ConfigHandler(rv);
-		reader.setContentHandler(handler);
-		reader.parse(xml);
+		reader.parse(xml, handler);
 		return rv;
 	}
 

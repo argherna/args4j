@@ -26,11 +26,13 @@ public interface OptionHandlerFilter {
      * @return
      *      true to choose this option, false to ignore/discard/disregard it.
      */
+    @SuppressWarnings("rawtypes")
     boolean select(OptionHandler o);
 
     /**
      * Print all defined options in the example.
      */
+    @SuppressWarnings("rawtypes")
     OptionHandlerFilter ALL = new OptionHandlerFilter() {
         public boolean select(OptionHandler o) {
             return true;
@@ -43,6 +45,7 @@ public interface OptionHandlerFilter {
      * <p>
      * This would only be useful with a small number of options.
      */
+    @SuppressWarnings("rawtypes")
     OptionHandlerFilter PUBLIC = new OptionHandlerFilter() {
         public boolean select(OptionHandler o) {
             return !o.option.hidden();
@@ -52,6 +55,7 @@ public interface OptionHandlerFilter {
     /**
      * Print all {@linkplain Option#required() required} options.
      */
+    @SuppressWarnings("rawtypes")
     OptionHandlerFilter REQUIRED = new OptionHandlerFilter() {
         public boolean select(OptionHandler o) {
             return o.option.required();

@@ -1,44 +1,73 @@
 package org.kohsuke.args4j;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.kohsuke.args4j.Args4JUtilities.getUsageLines;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.kohsuke.args4j.EnumAttribute.Animal;
 
-public class EnumAttributeTest extends Args4JTestBase<EnumAttribute> {
+public class EnumAttributeTest {
 
-	@Override
-	public EnumAttribute getTestObject() {
-		return new EnumAttribute();
+	private CmdLineParser parser;
+
+	private EnumAttribute enumAttr;
+
+	@BeforeEach
+	public void setup() {
+		enumAttr = new EnumAttribute();
+		parser = new CmdLineParser(enumAttr);
 	}
-	
-	public void testSetEnum() throws CmdLineException {
-		args = new String[]{"-animal", "HORSE"};
-		parser.parseArgument(args);
-		assertEquals(Animal.HORSE, testObject.myAnimal);
+
+	@Test
+	public void testSetEnum() {
+		try {
+			parser.parseArgument(new String[] {"-animal", "HORSE"});
+		} catch (CmdLineException e) {
+			fail(e.getMessage());
+		}
+		assertEquals(Animal.HORSE, enumAttr.myAnimal);
 	}
-	
-	public void testSetEnumCaseInsensitive() throws CmdLineException {
-		args = new String[]{"-animal", "horse"};
-		parser.parseArgument(args);
-		assertEquals(Animal.HORSE, testObject.myAnimal);
+
+	@Test
+	public void testSetEnumCaseInsensitive() {
+		try {
+			parser.parseArgument(new String[] {"-animal", "horse"});
+		} catch (CmdLineException e) {
+			fail(e.getMessage());
+		}
+		assertEquals(Animal.HORSE, enumAttr.myAnimal);
 	}
-	
+
+	@Test
 	public void testIllegalEnum() {
-		args = new String[]{"-animal", "ILLEGAL_ANIMAL"};
-		try {
-			parser.parseArgument(args);
-			fail("Can't set ILLEGAL_ANIMAL as value.");
-		} catch (CmdLineException e) {
-			// exptected
-		}
+		assertThrows(CmdLineException.class,
+				() -> parser.parseArgument(new String[] {"-animal", "ILLEGAL_ANIMAL"}));
 	}
-	
+
+	@Test
 	public void testUsage() {
-		args = new String[]{"-wrong"};
-		try {
-			parser.parseArgument(args);
-		} catch (CmdLineException e) {
-			assertUsageContains("Usage message should contain the enum VALUES", "HORSE");
-			assertUsageContains("Usage message should contain the enum VALUES", "DUCK");
+		assertThrows(CmdLineException.class, () -> parser.parseArgument(new String[] {"-wrong"}));
+		var usageLines = getUsageLines(parser);
+		var containsHorse = false;
+		for (var usageLine : usageLines) {
+			containsHorse = usageLine.contains(EnumAttribute.Animal.HORSE.name());
+			if (containsHorse) {
+				break;
+			}
 		}
+		assertTrue(containsHorse);
+		var containsDuck = false;
+		for (var usageLine : usageLines) {
+			containsDuck = usageLine.contains(EnumAttribute.Animal.DUCK.name());
+			if (containsDuck) {
+				break;
+			}
+		}
+		assertTrue(containsDuck);
 	}
 
 }

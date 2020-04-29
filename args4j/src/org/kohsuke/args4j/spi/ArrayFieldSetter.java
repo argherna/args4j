@@ -20,6 +20,7 @@ import java.util.List;
  *
  * @author Kohsuke Kawaguchi
  */
+@SuppressWarnings("rawtypes")
 final class ArrayFieldSetter implements Getter, Setter {
     private final Object bean;
     private final Field f;
@@ -68,7 +69,7 @@ final class ArrayFieldSetter implements Getter, Setter {
     	return true;
     }
 
-    public Class getType() {
+    public Class<?> getType() {
         return f.getType().getComponentType();
     }
 
@@ -105,7 +106,7 @@ final class ArrayFieldSetter implements Getter, Setter {
     public List<Object> getValueList() {
         f.setAccessible(true);
         try {
-            List<Object> r = new ArrayList<Object>();
+            List<Object> r = new ArrayList<>();
 
 
             // array element might be primitive, so Arrays.asList() won't always work

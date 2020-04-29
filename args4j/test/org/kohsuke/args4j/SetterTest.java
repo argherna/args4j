@@ -1,64 +1,78 @@
 package org.kohsuke.args4j;
 
-public class SetterTest extends Args4JTestBase<Setter> {
-    @Override
-    public Setter getTestObject() {
-        return new Setter();
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import static org.kohsuke.args4j.Args4JUtilities.getUsageLines;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+public class SetterTest {
+
+    private CmdLineParser parser;
+
+    private Setter testObject;
+
+    @BeforeEach
+    public void setup() {
+        testObject = new Setter();
+        parser = new CmdLineParser(testObject);
     }
 
+    @Test
     public void testSettingStringNoValues() {
         Setter bo = testObject;
-        args = new String[]{};
         try {
-            parser.parseArgument(args);
-            assertTrue("Default value set.", "default".equals(bo.str));
+            parser.parseArgument(new String[] {});
+            assertTrue("default".equals(bo.str));
         } catch (CmdLineException e) {
             fail("Call without parameters is valid!");
         }
     }
 
+    @Test
     public void testSettingString() {
         Setter bo = testObject;
-        args = new String[]{"-str","test"};
         try {
-            parser.parseArgument(args);
-            assertTrue("Given value set.", "TEST".equals(bo.str));
+            parser.parseArgument(new String[] {"-str", "test"});
+            assertTrue("TEST".equals(bo.str));
         } catch (CmdLineException e) {
             fail("Setting a string value should be possible");
         }
     }
 
+    @Test
     public void testSettingUsage() {
-        args = new String[]{"-wrong-usage"};
-        try {
-            parser.parseArgument(args);
-            fail("Doesnt detect wrong parameters.");
-        } catch (CmdLineException e) {
-            String expectedError = "\"-wrong-usage\" is not a valid option";
-            String expectedUsage   = " -str VAL : set a string";
-            String errorMessage = e.getMessage();
-            String[] usageLines = getUsageMessage();
-            assertUsageLength(1);
-            assertTrue("Got wrong error message", errorMessage.startsWith(expectedError));
-            assertEquals(expectedUsage, usageLines[0]);
-        }
+        var expectedError = "\"-wrong-usage\" is not a valid option";
+        var expectedUsage = " -str VAL : set a string";
+        var e = assertThrows(CmdLineException.class,
+                () -> parser.parseArgument(new String[] {"-wrong-usage"}));
+        var usageLines = getUsageLines(parser);
+        assertEquals(1, usageLines.length);
+        assertTrue(e.getMessage().startsWith(expectedError));
+        assertEquals(expectedUsage, usageLines[0]);
     }
 
+    @Test
     public void testMissingParameter() {
-        args = new String[]{"-str"};
-        try {
-            parser.parseArgument(args);
-            fail("Should miss one parameter.");
-        } catch (CmdLineException e) {
-            String expectedError = "Option \"-str\" takes an operand";
-            String expectedUsage   = " -str VAL : set a string";
-            
-            String[] usageLines = getUsageMessage();
-            String errorMessage = e.getMessage();
-            assertUsageLength(1);
-            assertTrue("Got wrong error message: " + errorMessage, errorMessage.startsWith(expectedError));
-            assertEquals("Got wrong usage message", expectedUsage, usageLines[0]);
-        }
+        var expectedError = "Option \"-str\" takes an operand";
+        var expectedUsage = " -str VAL : set a string";
+        var usageLines = getUsageLines(parser);
+        assertEquals(1, usageLines.length);
+        assertEquals(expectedUsage, usageLines[0]);
+        var e = assertThrows(CmdLineException.class, () -> parser.parseArgument("-str"));
+        assertTrue(e.getMessage().startsWith(expectedError));
     }
 
+    private static class Setter {
+        public String str = "default";
+        @Option(name = "-str", usage = "set a string")
+        public void setStr(String str) {
+            this.str = str.toUpperCase();
+        }
+
+    }
 }

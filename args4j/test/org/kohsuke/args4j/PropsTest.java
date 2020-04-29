@@ -1,134 +1,146 @@
 package org.kohsuke.args4j;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import java.util.HashMap;
 import java.util.Map;
 
-public class PropsTest extends Args4JTestBase<Props> {
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-    @Override
-    public Props getTestObject() {
-        return new Props();
+public class PropsTest {
+
+    private CmdLineParser parser;
+
+    private Props testObject;
+
+    @BeforeEach
+    public void setup() {
+        testObject = new Props();
+        parser = new CmdLineParser(testObject);
     }
 
-    public void testDoNothing() {
-        // ignore, that the other test cases are commented out
-        // JUnit doesnt like TestCases without a test-method.
-    }
-
+    @Test
     public void testNoValues() {
-        args = new String[]{};
         try {
-            parser.parseArgument(args);
-            Map<String,String> map = testObject.props;
+            parser.parseArgument(new String[] {});
+            Map<String, String> map = testObject.props;
             if (map == null) {
-            	// as expected
-            	return;
+                // as expected
+                return;
             }
-            assertTrue("Values illegally arrived.", map.size()==0);
+            assertTrue(map.isEmpty());
         } catch (CmdLineException e) {
             fail("Call without parameters is valid! " + e.getMessage());
         }
     }
 
+    @Test
     public void testHasEqual() {
-        args = new String[]{"-T", "key1=value1=more", "-T", "key2=value2=more"};
         try {
-            parser.parseArgument(args);
-            Map<String,String> map = testObject.props;
-            assertTrue("The key was not set.", map.containsKey("key1"));
-            assertTrue("The key was not set.", map.containsKey("key2"));
-            assertEquals("More keys than expected.", map.size(), 2);
-            assertEquals("Key has wrong value", map.get("key1"), "value1=more");
-            assertEquals("Key has wrong value", map.get("key2"), "value2=more");
+            parser.parseArgument(new String[] {"-T", "key1=value1=more", "-T", "key2=value2=more"});
+            Map<String, String> map = testObject.props;
+            assertTrue(map.containsKey("key1"));
+            assertTrue(map.containsKey("key2"));
+            assertEquals(2, map.size());
+            assertEquals("value1=more", map.get("key1"));
+            assertEquals("value2=more", map.get("key2"));
         } catch (CmdLineException e) {
-            fail("Cought an invalid exception: " + e.getMessage());
+            fail("Caught an invalid exception: " + e.getMessage());
         }
     }
 
+    @Test
     public void testSinglePair() {
-        args = new String[]{"-T", "key1=value1"};
         try {
-            parser.parseArgument(args);
-            Map<String,String> map = testObject.props;
-            assertTrue("The key was not set.", map.containsKey("key1"));
-            assertEquals("More keys than expected.", map.size(), 1);
-            assertEquals("Key has wrong value", map.get("key1"), "value1");
+            parser.parseArgument(new String[] {"-T", "key1=value1"});
+            Map<String, String> map = testObject.props;
+            assertTrue(map.containsKey("key1"));
+            assertEquals(1, map.size());
+            assertEquals("value1", map.get("key1"));
         } catch (CmdLineException e) {
-            fail("Cought an invalid exception: " + e.getMessage());
+            fail("Caught an invalid exception: " + e.getMessage());
         }
     }
 
+    @Test
     public void testMultiplePairs() {
-        args = new String[]{"-T", "key1=value1", "-T", "key2=value2", "-T", "key3=value3"};
         try {
-            parser.parseArgument(args);
-            Map<String,String> map = testObject.props;
-            assertTrue("A key was not set.", map.containsKey("key1"));
-            assertTrue("A key was not set.", map.containsKey("key2"));
-            assertTrue("A key was not set.", map.containsKey("key3"));
-            assertEquals("Wrong number of keys.", map.size(), 3);
-            assertEquals("Key has wrong value", map.get("key1"), "value1");
-            assertEquals("Key has wrong value", map.get("key2"), "value2");
-            assertEquals("Key has wrong value", map.get("key3"), "value3");
+            parser.parseArgument(
+                    new String[] {"-T", "key1=value1", "-T", "key2=value2", "-T", "key3=value3"});
+            Map<String, String> map = testObject.props;
+            assertTrue(map.containsKey("key1"));
+            assertTrue(map.containsKey("key2"));
+            assertTrue(map.containsKey("key3"));
+            assertEquals(3, map.size());
+            assertEquals("value1", map.get("key1"));
+            assertEquals("value2", map.get("key2"));
+            assertEquals("value3", map.get("key3"));
         } catch (CmdLineException e) {
-            fail("Cought an invalid exception: " + e.getMessage());
+            fail("Caught an invalid exception: " + e.getMessage());
         }
     }
 
+    @Test
     public void testDuplicateKey() {
-        args = new String[]{"-T", "key1=one", "-T", "key1=two"};
         try {
-            parser.parseArgument(args);
-            Map<String,String> map = testObject.props;
-            assertTrue("A key was not set.", map.containsKey("key1"));
-            assertEquals("Wrong number of keys.", map.size(), 1);
-            assertEquals("As Map.put() defines: last put wins.", map.get("key1"), "two");
+            parser.parseArgument(new String[] {"-T", "key1=one", "-T", "key1=two"});
+            Map<String, String> map = testObject.props;
+            assertTrue(map.containsKey("key1"));
+            assertEquals(1, map.size());
+            assertEquals("two", map.get("key1"));
         } catch (CmdLineException e) {
-            fail("Cought an invalid exception: " + e.getMessage());
+            fail("Caught an invalid exception: " + e.getMessage());
         }
     }
 
+    @Test
     public void testInitialisation() {
-        args = new String[]{"-T", "key1=value1"};
         try {
             testObject.props = null;
-            parser.parseArgument(args);
-            Map<String,String> map = testObject.props;
-            assertNotNull("Map should have been initialized with a new HashMap", map);
-            assertEquals("Key has wrong value", map.get("key1"), "value1");
+            parser.parseArgument(new String[] {"-T", "key1=value1"});
+            Map<String, String> map = testObject.props;
+            assertNotNull(map);
+            assertEquals("value1", map.get("key1"));
         } catch (CmdLineException e) {
-            fail("Cought an invalid exception: " + e.getMessage());
+            fail("Caught an invalid exception: " + e.getMessage());
         }
     }
 
+    @Test
     public void testNoValue() {
-        args = new String[]{"-T", "key="};
         try {
-            parser.parseArgument(args);
-            Map<String,String> map = testObject.props;
-            assertNull("Key has wrong value", map.get("key"));
+            parser.parseArgument(new String[] {"-T", "key="});
+            Map<String, String> map = testObject.props;
+            assertNull(map.get("key"));
         } catch (CmdLineException e) {
-            fail("Cought an invalid exception: " + e.getMessage());
+            fail("Caught an invalid exception: " + e.getMessage());
         }
     }
 
+    @Test
     public void testNoKey() {
-        args = new String[]{"-T", "=value"};
-        try {
-            parser.parseArgument(args);
-            fail("An exception should have been thrown.");
-        } catch (CmdLineException e) {
-        	assertEquals("Wrong error message.", "A key must be set.", e.getMessage());
-        }
+        var e = assertThrows(CmdLineException.class,
+                () -> parser.parseArgument(new String[] {"-T", "=value"}));
+        assertEquals("A key must be set.", e.getMessage());
     }
 
+    @Test
     public void testNoSplitCharacter() {
-        args = new String[]{"-T", "keyvalue"};
-        try {
-            parser.parseArgument(args);
-            fail("An exception should have been thrown.");
-        } catch (CmdLineException e) {
-        	assertEquals("Wrong error message.", "An argument for setting a Map must contain a \"=\"", e.getMessage());
-        }
+        var e = assertThrows(CmdLineException.class,
+                () -> parser.parseArgument(new String[] {"-T", "keyvalue"}));
+        assertEquals("An argument for setting a Map must contain a \"=\"", e.getMessage());
     }
 
+    private static class Props {
+
+        @Option(name = "-T", usage = "sets a key-value-pair")
+        public Map<String, String> props = new HashMap<String, String>();
+
+    }
 }

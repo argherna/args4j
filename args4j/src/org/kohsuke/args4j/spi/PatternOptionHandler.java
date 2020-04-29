@@ -30,7 +30,7 @@ public class PatternOptionHandler extends OptionHandler<Pattern> {
 			p = Pattern.compile(s);
 		}
 		catch (PatternSyntaxException x) {
-			throw new CmdLineException(owner, Messages.ILLEGAL_PATTERN.format(option.toString(), s));
+			throw new CmdLineException(owner, Messages.ILLEGAL_PATTERN, option.toString(), s);
 		}
 		setter.addValue(p);
 		return 1;

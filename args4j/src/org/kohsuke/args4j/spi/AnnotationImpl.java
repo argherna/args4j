@@ -15,6 +15,7 @@ public abstract class AnnotationImpl implements Annotation {
         this.annotationType = annotationType;
     }
 
+	@SuppressWarnings({"unchecked", "rawtypes"})
     protected AnnotationImpl(Class<? extends Annotation> annotationType, ConfigElement ce) throws ClassNotFoundException {
         this(annotationType);
 
@@ -35,7 +36,9 @@ public abstract class AnnotationImpl implements Annotation {
 	public String[] aliases() {
 		return Arrays.copyOf(aliases, aliases.length);
 	}
+	@SuppressWarnings("rawtypes")
 	public Class<? extends OptionHandler> handler;
+	@SuppressWarnings("rawtypes")
 	public Class<? extends OptionHandler> handler() {
 		return handler;
 	}

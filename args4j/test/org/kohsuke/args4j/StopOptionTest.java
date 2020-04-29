@@ -1,6 +1,10 @@
 package org.kohsuke.args4j;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.kohsuke.args4j.spi.StopOptionHandler;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
@@ -9,7 +13,9 @@ import java.util.List;
  *
  * @author Kohsuke Kawaguchi
  */
-public class StopOptionTest extends Args4JTestBase<StopOptionTest> {
+public class StopOptionTest {
+
+    private CmdLineParser parser;
 
     @Argument
     @Option(name="--",handler= StopOptionHandler.class)
@@ -18,11 +24,12 @@ public class StopOptionTest extends Args4JTestBase<StopOptionTest> {
     @Option(name="-n")
     int n;
 
-    @Override
-    public StopOptionTest getTestObject() {
-        return this;
+    @BeforeEach
+    public void setup() {
+        parser = new CmdLineParser(this);
     }
 
+    @Test
     public void test1() throws Exception {
         parser.parseArgument("-n","5","abc","def");
 
@@ -32,6 +39,7 @@ public class StopOptionTest extends Args4JTestBase<StopOptionTest> {
         assertEquals("def",args.get(1));
     }
 
+    @Test
     public void test2() throws Exception {
         parser.parseArgument("--","-n","5","abc","def");
 

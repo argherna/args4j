@@ -4,10 +4,12 @@ import org.kohsuke.args4j.Argument;
 
 /**
  * Implementation of @Argument so we can instantiate it.
+ * 
  * @author Jan Materne
  */
+@SuppressWarnings("all")
 public class ArgumentImpl extends AnnotationImpl implements Argument {
 	public ArgumentImpl(ConfigElement ce) throws ClassNotFoundException {
-		super(Argument.class,ce);
+		super(Argument.class, ce);
 	}
 }

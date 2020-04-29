@@ -1,35 +1,71 @@
 package org.kohsuke.args4j;
 
-public class KeyValueTest extends Args4JTestBase<KeyValue> {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
-  @Override
-  public KeyValue getTestObject() {
-    return new KeyValue();
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+public class KeyValueTest {
+
+  private CmdLineParser parser;
+
+  private KeyValue testObject;
+
+  @BeforeEach
+  public void getTestObject() {
+    testObject = new KeyValue();
+    parser = new CmdLineParser(testObject);
   }
 
-  public void testDouble() throws CmdLineException {
-    args = new String[]{"--double=42.54"};
-    parser.parseArgument(args);
+  @Test
+  public void testDouble() {
+    try {
+      parser.parseArgument(new String[] {"--double=42.54"});
+    } catch (CmdLineException e) {
+      fail(e.getMessage());
+    }
     assertEquals(42.54, testObject._double, 0);
   }
 
-  public void testDoubleShort() throws CmdLineException {
-    args = new String[]{"-d=42.54"};
-    parser.parseArgument(args);
+  @Test
+  public void testDoubleShort() {
+    try {
+      parser.parseArgument(new String[] {"-d=42.54"});
+    } catch (CmdLineException e) {
+      fail(e.getMessage());
+    }
     assertEquals(42.54, testObject._double, 0);
   }
 
-
-  public void testChar() throws CmdLineException {
-    args = new String[]{"--string=stringValue"};
-    parser.parseArgument(args);
+  @Test
+  public void testChar() {
+    try {
+      parser.parseArgument(new String[] {"--string=stringValue"});
+    } catch (CmdLineException e) {
+      fail(e.getMessage());
+    }
     assertEquals("stringValue", testObject._string);
   }
 
-  public void testCharShort() throws CmdLineException {
-    args = new String[]{"-s=stringValue"};
-    parser.parseArgument(args);
+  @Test
+  public void testCharShort() {
+    try {
+      parser.parseArgument(new String[] {"-s=stringValue"});
+    } catch (CmdLineException e) {
+      fail(e.getMessage());
+    }
     assertEquals("stringValue", testObject._string);
+  }
+
+  private static class KeyValue {
+
+    @Option(name = "-s", aliases = "--string")
+    public String _string;
+
+    @Option(name = "-d", aliases = "--double")
+    public double _double;
+
   }
 
 }

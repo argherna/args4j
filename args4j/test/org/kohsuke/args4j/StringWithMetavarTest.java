@@ -2,83 +2,74 @@ package org.kohsuke.args4j;
 
 import java.io.StringWriter;
 
-public class StringWithMetavarTest extends Args4JTestBase<StringWithMetavar> {
-    @Override
-    public StringWithMetavar getTestObject() {
-        return new StringWithMetavar();
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.kohsuke.args4j.Args4JUtilities.getUsageLines;
+
+public class StringWithMetavarTest {
+
+    private CmdLineParser parser;
+
+    private StringWithMetavar testObject;
+
+    @BeforeEach
+    public void getTestObject() {
+        testObject = new StringWithMetavar();
+        parser = new CmdLineParser(testObject);
     }
 
+    @Test
     public void testSettingUsage() {
-        args = new String[]{"-wrong-usage"};
-        try {
-            parser.parseArgument(args);
-            fail("Doesn't detect wrong parameters.");
-        } catch (CmdLineException e) {
-            String expectedError = "\"-wrong-usage\" is not a valid option";
-            String expectedUsage   = " -str METAVAR : set a string";
-            String expectedSingleLineUsage   = " [-str METAVAR]";
-            String[] usageLines = getUsageMessage();
-            String singleLineUsage = getSingleLineUsage();
-            assertUsageLength(1);
-            assertErrorMessagePrefix(expectedError, e);
-            assertEquals("Got wrong usage message", expectedUsage, usageLines[0]);
-            assertEquals("Got wrong usage summary", expectedSingleLineUsage, singleLineUsage);
-        }
+        var e = assertThrows(CmdLineException.class, () -> parser.parseArgument("-wrong-usage"));
+        assertTrue(e.getMessage().startsWith("\"-wrong-usage\" is not a valid option"));
+        var usageLines = getUsageLines(parser);
+        assertEquals(1, usageLines.length);
+        assertEquals(" -str METAVAR : set a string", usageLines[0]);
+        assertEquals(" [-str METAVAR]", getSingleLineUsage());
     }
 
+    @Test
     public void testMissingParameter() {
-        args = new String[]{"-str"};
-        try {
-            parser.parseArgument(args);
-            fail("Should miss one parameter.");
-        } catch (CmdLineException e) {
-            String expectedError = "Option \"-str\" takes an operand";
-            String expectedUsage   = " -str METAVAR : set a string";
-            String[] usageLines = getUsageMessage();
-            assertUsageLength(1);
-            assertErrorMessagePrefix(expectedError, e);
-            assertEquals("Got wrong usage message", expectedUsage, usageLines[0]);
-        }
+        var e = assertThrows(CmdLineException.class, () -> parser.parseArgument("-str"));
+        var usageLines = getUsageLines(parser);
+        assertEquals(1, usageLines.length);
+        assertTrue(e.getMessage().startsWith("Option \"-str\" takes an operand"));
+        assertEquals(" -str METAVAR : set a string", usageLines[0]);
     }
 
     private String getSingleLineUsage() {
-        StringWriter buffer = new StringWriter();
+        var buffer = new StringWriter();
         parser.printSingleLineUsage(buffer, null);
         buffer.flush();
         return buffer.toString();
     }
 
+    @Test
     public void testEqualsSeparator() {
-        args = new String[]{"-wrong-usage"};
         parser.getProperties().withOptionValueDelimiter("=");
-        try {
-            parser.parseArgument(args);
-            fail("Doesn't detect wrong parameters.");
-        } catch (CmdLineException e) {
-            String expectedUsage   = " -str=METAVAR : set a string";
-            String expectedSingleLineUsage   = " [-str=METAVAR]";
-            String[] usageLines = getUsageMessage();
-            String singleLineUsage = getSingleLineUsage();
-            assertUsageLength(1);
-            assertEquals("Got wrong usage message", expectedUsage, usageLines[0]);
-            assertEquals("Got wrong usage summary", expectedSingleLineUsage, singleLineUsage);
-        }
+        assertThrows(CmdLineException.class, () -> parser.parseArgument("-wrong-usage"));
+        var usageLines = getUsageLines(parser);
+        assertEquals(1, usageLines.length);
+        assertEquals(" -str=METAVAR : set a string", usageLines[0]);
+        assertEquals(" [-str=METAVAR]", getSingleLineUsage());
     }
 
+    @Test
     public void testExplicitNoEqualsSeparator() {
-        args = new String[]{"-wrong-usage"};
         parser.getProperties().withOptionValueDelimiter(" ");
-        try {
-            parser.parseArgument(args);
-            fail("Doesn't detect wrong parameters.");
-        } catch (CmdLineException e) {
-            String expectedUsage   = " -str METAVAR : set a string";
-            String expectedSingleLineUsage   = " [-str METAVAR]";
-            String[] usageLines = getUsageMessage();
-            String singleLineUsage = getSingleLineUsage();
-            assertUsageLength(1);
-            assertEquals("Got wrong usage message", expectedUsage, usageLines[0]);
-            assertEquals("Got wrong usage summary", expectedSingleLineUsage, singleLineUsage);
-        }
+        assertThrows(CmdLineException.class, () -> parser.parseArgument("-wrong-usage"));
+        var usageLines = getUsageLines(parser);
+        assertEquals(1, usageLines.length);
+        assertEquals(" -str METAVAR : set a string", usageLines[0]);
+        assertEquals(" [-str METAVAR]", getSingleLineUsage());
+    }
+
+    private static class StringWithMetavar {
+        @Option(name = "-str", usage = "set a string", metaVar = "METAVAR")
+        public String str;
     }
 }

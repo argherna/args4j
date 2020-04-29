@@ -53,6 +53,7 @@ public abstract class DelimitedOptionHandler<T> extends OptionHandler<T> {
      *
      * @return null if the current value of the setter isn't available.
      */
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public String printDefaultValue() {
         if (setter instanceof Getter) {
             Getter getter = (Getter)setter;

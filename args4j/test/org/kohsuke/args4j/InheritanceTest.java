@@ -1,54 +1,66 @@
 package org.kohsuke.args4j;
 
-public class InheritanceTest extends Args4JTestBase<Inheritance> {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
-    @Override
-    public Inheritance getTestObject() {
-        return new Inheritance();
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+public class InheritanceTest {
+
+    private CmdLineParser parser;
+
+    private Inheritance testObject;
+
+    @BeforeEach
+    public void setup() {
+        testObject = new Inheritance();
+        parser = new CmdLineParser(testObject);
     }
-    
+
+    @Test
     public void testMyself() {
-        args = new String[]{"-m","Thats me"};
         Inheritance bo = testObject;
         try {
-            parser.parseArgument(args);
-            assertEquals("Value for class itself not arrived", "Thats me", bo.me);
+            parser.parseArgument(new String[] {"-m", "Thats me"});
+            assertEquals("Thats me", bo.me);
         } catch (CmdLineException e) {
             fail("This exception should not occur");
         }
     }
 
+    @Test
     public void testFather() {
-        args = new String[]{"-f","My father"};
         Inheritance bo = testObject;
         try {
-            parser.parseArgument(args);
-            assertEquals("Value for class itself not arrived", "My father", bo.father);
+            parser.parseArgument(new String[] {"-f", "My father"});
+            assertEquals("My father", bo.father);
         } catch (CmdLineException e) {
             fail("This exception should not occur");
         }
     }
 
+    @Test
     public void testGrandfather() {
-        args = new String[]{"-g","My fathers father"};
         Inheritance bo = testObject;
         try {
-            parser.parseArgument(args);
-            assertEquals("Value for class itself not arrived", "My fathers father", bo.grandpa);
+            parser.parseArgument(new String[] {"-g", "My fathers father"});
+            assertEquals("My fathers father", bo.grandpa);
         } catch (CmdLineException e) {
             fail("This exception should not occur");
         }
     }
-    
+
+    @Test
     public void testMother() {
-        args = new String[]{"-mom","Hi Mom"};
         Inheritance bo = testObject;
         try {
-            parser.parseArgument(args);
-            assertNull("Annotations are not designed for use in interfaces", bo.mom);
+            parser.parseArgument(new String[] {"-mom", "Hi Mom"});
+            assertNull(bo.mom);
         } catch (CmdLineException e) {
-            //no-op
+            // no-op
         }
     }
-    
+
 }

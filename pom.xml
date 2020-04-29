@@ -80,6 +80,8 @@
   </organization>
 
   <properties>
+    <maven.compiler.source>13</maven.compiler.source>
+    <maven.compiler.target>13</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -88,17 +90,16 @@
       <plugins>
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.1</version>
+          <!-- <version>3.8.1</version> -->
           <configuration>
-            <source>1.6</source>
-            <target>1.6</target>
-            <compilerArgument>-proc:none</compilerArgument>
+            <source>${maven.compiler.source}</source>
+            <target>${maven.compiler.target}</target>
           </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>2.3.1</version>
+          <version>3.2.0</version>
         </plugin>
       </plugins>
     </pluginManagement>  
@@ -145,8 +146,8 @@
   
   <modules>
     <module>args4j</module>
-    <module>args4j-tools</module>
+    <!-- <module>args4j-tools</module>
     <module>args4j-maven-plugin</module>
-    <module>args4j-maven-plugin-example</module>
+    <module>args4j-maven-plugin-example</module> -->
   </modules>
 </project>

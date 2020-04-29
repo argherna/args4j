@@ -11,6 +11,7 @@ import java.lang.reflect.Method;
  *
  * @author Kohsuke Kawaguchi
  */
+@SuppressWarnings("rawtypes")
 public final class MethodSetter implements Setter {
     private final CmdLineParser parser;
     private final Object bean;

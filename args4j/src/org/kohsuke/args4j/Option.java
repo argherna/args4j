@@ -189,6 +189,7 @@ public @interface Option {
      * boolean value;
      * </pre>
      */
+    @SuppressWarnings("rawtypes")
     Class<? extends OptionHandler> handler() default OptionHandler.class;
 
     /**

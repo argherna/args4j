@@ -14,6 +14,7 @@ public class ParserProperties {
     private static final int DEFAULT_USAGE_WIDTH = 80;
 
     private int usageWidth = DEFAULT_USAGE_WIDTH;
+    @SuppressWarnings("rawtypes")
     private Comparator<OptionHandler> optionSorter = DEFAULT_COMPARATOR;
     private String optionValueDelimiter=" ";
     private boolean atSyntax = true;
@@ -102,6 +103,7 @@ public class ParserProperties {
      * @param sorter
      *      If non-{@code null}, options are sorted in the order induced by this comparator.
      */
+    @SuppressWarnings("rawtypes")
     public ParserProperties withOptionSorter(Comparator<OptionHandler> sorter) {
         this.optionSorter = sorter;
         return this;
@@ -113,6 +115,7 @@ public class ParserProperties {
      *      Otherwise the returned comparator is used to sort options.
      *      The default value is a comparator that sorts options alphabetically.
      */
+    @SuppressWarnings("rawtypes")
     Comparator<OptionHandler> getOptionSorter() {
         return optionSorter;
     }
@@ -133,6 +136,7 @@ public class ParserProperties {
         return this.optionValueDelimiter;
     }
 
+    @SuppressWarnings("rawtypes")
     static final Comparator<OptionHandler> DEFAULT_COMPARATOR = new Comparator<OptionHandler>() {
         public int compare(OptionHandler o1, OptionHandler o2) {
             return o1.option.toString().compareTo(o2.option.toString());

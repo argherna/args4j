@@ -1,55 +1,50 @@
 package org.kohsuke.args4j;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 // a 'custom' exception
 import javax.management.InvalidAttributeValueException;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class CustomExceptionTest extends Args4JTestBase<CustomExceptionTest> {
 
-    private final String errMsgX = "this is a usual CLI exception";
-    private final String errMsgY = "this is a 'custom' exception";
+public class CustomExceptionTest {
 
+    private static final String ERR_MSG_X = "this is a usual CLI exception";
+    private static final String ERR_MSG_Y = "this is a 'custom' exception";
+
+    private CmdLineParser parser;
+
+    @BeforeEach
+    public void setup() {
+        parser = new CmdLineParser(this);
+    }
 
     @Option(name="-x")
     public void setX(String x) {
-        throw new IllegalArgumentException(errMsgX);
+        throw new IllegalArgumentException(ERR_MSG_X);
     }
     
     @Option(name="-y")
     public void setY(String y) throws InvalidAttributeValueException {
-        throw new InvalidAttributeValueException(errMsgX);
-    }
-
-
-    @Override
-    public CustomExceptionTest getTestObject() {
-        return this;
+        throw new InvalidAttributeValueException(ERR_MSG_Y);
     }
     
-    
-    protected void assertException(String expected, Class expectedExceptionClass, String... parserArgs) {
-        String expMsg = expectedExceptionClass.getName() + ": " + expected;
-        try {
-            parser.parseArgument(parserArgs);
-            fail("Exception expected.");
-        } catch (RuntimeException e) {
-            // RuntimeExceptions are passed through the parser to the caller.
-            assertEquals("Lost exception message.", expMsg, e.toString());
-        } catch (CmdLineException e) {
-            // Other Exceptions are wrapped into a CLE so we must ensure not to loose the
-            // message.
-            assertEquals("Lost exception message.", expMsg, e.getMessage());
-        } catch (Exception e) {
-            fail("Wrong exception type thrown.");
-        }
-    }
-    
+    @Test
     public void testRuntimeException() throws Exception {
-        assertException(errMsgX, IllegalArgumentException.class, "-x", "value");
+        var e = assertThrows(IllegalArgumentException.class, () -> parser.parseArgument("-x", "value"));
+        assertEquals(ERR_MSG_X, e.getMessage());
     }
     
+    @Test
     public void testCustomException() throws Exception {
-        assertException(errMsgX, InvalidAttributeValueException.class, "-y", "value");
+        // var e = assertThrows(InvalidAttributeValueException.class, () -> parser.parseArgument("-y", "value"));
+        var e = assertThrows(CmdLineException.class, () -> parser.parseArgument("-y", "value"));
+        var cause = e.getCause();
+        assertTrue(cause.getClass() == InvalidAttributeValueException.class);
+        assertEquals(ERR_MSG_Y, cause.getMessage());
     }
-
 }

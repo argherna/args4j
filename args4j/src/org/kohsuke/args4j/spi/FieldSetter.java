@@ -10,6 +10,7 @@ import java.util.List;
  *
  * @author Kohsuke Kawaguchi
  */
+@SuppressWarnings("rawtypes")
 public final class FieldSetter implements Getter, Setter {
     private final Field f;
     private final Object bean;
@@ -19,17 +20,17 @@ public final class FieldSetter implements Getter, Setter {
         this.f = f;
     }
 
-    public Class getType() {
+    public Class<?> getType() {
         return f.getType();
     }
-    
+
     public boolean isMultiValued() {
         // a field can only store one value. a collection field is handled via MultiValueFieldSetter
-    	return false;
+        return false;
     }
 
     public FieldSetter asFieldSetter() {
-        return new FieldSetter(bean,f);
+        return new FieldSetter(bean, f);
     }
 
     public AnnotatedElement asAnnotatedElement() {
@@ -38,12 +39,12 @@ public final class FieldSetter implements Getter, Setter {
 
     public void addValue(Object value) {
         try {
-            f.set(bean,value);
+            f.set(bean, value);
         } catch (IllegalAccessException ex) {
             // try again
             f.setAccessible(true);
             try {
-                f.set(bean,value);
+                f.set(bean, value);
             } catch (IllegalAccessException e) {
                 throw new IllegalAccessError(e.getMessage());
             }
@@ -69,7 +70,9 @@ public final class FieldSetter implements Getter, Setter {
     }
 
     private List<Object> asList(Object o) {
-        if (o!=null)    return Collections.singletonList(o);
+        if (o != null) {
+            return Collections.singletonList(o);
+        }
         return Collections.emptyList();
     }
 }

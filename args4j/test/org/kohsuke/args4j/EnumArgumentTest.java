@@ -1,43 +1,55 @@
 package org.kohsuke.args4j;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.kohsuke.args4j.EnumAttribute.Animal;
 
-import junit.framework.Assert;
 
+public class EnumArgumentTest {
 
-public class EnumArgumentTest extends Args4JTestBase<EnumArgument> {
+	private CmdLineParser parser;
 
-	@Override
-	public EnumArgument getTestObject() {
-		return new EnumArgument();
+	private EnumArgument enumArg;
+
+	@BeforeEach
+	public void setup() {
+		enumArg = new EnumArgument();
+		parser = new CmdLineParser(enumArg);
 	}
 
-	public void testSetEnum() throws CmdLineException {
-		args = new String[]{"HORSE"};
-		assertEquals(null, testObject.myAnimal);
-		parser.parseArgument(args);
-		assertEquals(Animal.HORSE, testObject.myAnimal);
-	}
-
-	public void testSetEnumCaseInsensitive() throws CmdLineException {
-		args = new String[]{"horse"};
-		assertEquals(null, testObject.myAnimal);
-		parser.parseArgument(args);
-		assertEquals(Animal.HORSE, testObject.myAnimal);
-	}
-
-	public void testIllegalArgumentOption() {
-		args = new String[] { "ILLEGAL_ANIMAL" };
+	@Test
+	public void testSetEnum() {
+		assertNull(enumArg.myAnimal);
 		try {
-			parser.parseArgument(args);
-			Assert.fail();
+			parser.parseArgument(new String[] {"HORSE"});
 		} catch (CmdLineException e) {
-			Assert.assertTrue(
-					"Illegal exception message: " + e.getMessage(),
-					e.getMessage().startsWith(
-							String.format("\"%s\" is not a valid value for \"", args[args.length - 1])
-					));
+			fail(e.getMessage());
 		}
+		assertEquals(Animal.HORSE, enumArg.myAnimal);
 	}
 
+	@Test
+	public void testSetEnumCaseInsensitive() {
+		assertNull(enumArg.myAnimal);
+		try {
+			parser.parseArgument(new String[] {"horse"});
+		} catch (CmdLineException e) {
+			fail(e.getMessage());
+		}
+		assertEquals(Animal.HORSE, enumArg.myAnimal);
+	}
+
+	@Test
+	public void testIllegalArgumentOption() {
+		var e = assertThrows(CmdLineException.class,
+				() -> parser.parseArgument(new String[] {"ILLEGAL_ANIMAL"}));
+		assertTrue(e.getMessage().startsWith(String.format("\"%s\" is not a valid value for \"",
+				(new String[] {"ILLEGAL_ANIMAL"})[new String[] {"ILLEGAL_ANIMAL"}.length - 1])));
+	}
 }

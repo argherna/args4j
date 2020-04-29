@@ -1,14 +1,15 @@
 package org.kohsuke.args4j;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
 import java.io.ByteArrayOutputStream;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * @see https://args4j.dev.java.net/issues/show_bug.cgi?id=10
  */
-@SuppressWarnings("unused")
-public class Issue10Test extends TestCase {
+public class Issue10Test {
 	@Option(name="-enum", required=false, usage="Enum2")
 	private Enum crash;
 	
@@ -19,11 +20,11 @@ public class Issue10Test extends TestCase {
 	}
 
 	// The bug should be fixed with changing from manual printing to printf.
+	@Test
 	public void testIssue10() {
 		CmdLineParser parser = new CmdLineParser(this);
-		parser.printUsage(new ByteArrayOutputStream());
+		assertDoesNotThrow(() -> parser.printUsage(new ByteArrayOutputStream()));
 		// occurred error: StringIndexOutOfBoundsException with index < 0
-
 	}
 	
 }

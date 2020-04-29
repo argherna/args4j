@@ -1,31 +1,31 @@
 package org.kohsuke.args4j.spi;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.lang.reflect.Field;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
 
 /**
  * @author dantuch
  */
-@SuppressWarnings({"static-method", "unused"})
-public class SettersTest extends TestCase {
+@SuppressWarnings({"unused"})
+public class SettersTest {
 
     private final String finalField = "thisValueMakesItFinal";
     private String mutableField;
 
+    @Test
     public void testSNotCreateSetterForFinalField() throws Exception {
         // given
         Field f = SettersTest.class.getDeclaredField("finalField");
         // when
-        try {
-            Setters.create(f, null);
-            fail();
-        } catch (IllegalStateException e) {
-            // expected
-        }
+        assertThrows(IllegalStateException.class, () -> Setters.create(f, null));
     }
 
+    @Test
     public void testSCreateSetterForMutableField() throws Exception {
         // given
         Field f = SettersTest.class.getDeclaredField("mutableField");
@@ -33,6 +33,6 @@ public class SettersTest extends TestCase {
         @SuppressWarnings("rawtypes")
         Setter created = Setters.create(f, null);
         // then
-        Assert.assertNotNull(created);
+        assertNotNull(created);
     }
 }

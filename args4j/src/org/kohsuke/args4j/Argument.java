@@ -46,6 +46,7 @@ public @interface Argument {
     /**
      * See {@link Option#handler()}.
      */
+    @SuppressWarnings("rawtypes")
     Class<? extends OptionHandler> handler() default OptionHandler.class;
 
     /**

@@ -1,29 +1,46 @@
 package org.kohsuke.args4j;
 
-public class AliasedTest extends Args4JTestBase<Aliased> {
-    @Override
-    public Aliased getTestObject() {
-        return new Aliased();
+import static org.kohsuke.args4j.Args4JUtilities.getUsageLines;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+public class AliasedTest {
+
+    private CmdLineParser parser;
+
+    private Aliased aliased;
+
+    @BeforeEach
+    public void setup() {
+        aliased = new Aliased();
+        parser = new CmdLineParser(aliased);
     }
 
+    @Test
     public void testMissingParameter() {
-        setArgs("-str");
-        try {
-            parser.parseArgument(args);
-            fail("Should miss one parameter.");
-        } catch (CmdLineException e) {
-            String expectedError = "Option \"-str (--long-str)\" takes an operand";
-            String expectedUsage   = " -str (--long-str) METAVAR : set a string";
-            String[] usageLines = getUsageMessage();
-            assertUsageLength(1);
-            assertErrorMessagePrefix(expectedError, e);
-            assertEquals("Got wrong usage message", expectedUsage, usageLines[0]);
-        }
+        var e = assertThrows(CmdLineException.class, () -> parser.parseArgument("-str"));
+        var expectedError = "Option \"-str (--long-str)\" takes an operand";
+        assertTrue(e.getMessage().startsWith(expectedError));
+
+        var usageLines = getUsageLines(parser);
+        assertEquals(1, usageLines.length, "Wrong amount of lines in usage message");
+        var expectedUsage = " -str (--long-str) METAVAR : set a string";
+        assertEquals(expectedUsage, usageLines[0]);
     }
 
+    @Test
     public void testAlias() throws Exception {
-        setArgs("--long-str", "something");
-        parser.parseArgument(args);
-        assertEquals("something", testObject.str);
+        parser.parseArgument("--long-str", "something");
+        assertEquals("something", aliased.str);
+    }
+
+    private static class Aliased {
+        @Option(name = "-str", aliases = {"--long-str"}, usage = "set a string",
+                metaVar = "METAVAR")
+        public String str;
     }
 }

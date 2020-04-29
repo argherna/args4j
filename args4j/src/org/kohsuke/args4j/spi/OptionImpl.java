@@ -6,6 +6,7 @@ import org.kohsuke.args4j.Option;
  * Implementation of @Option so we can instantiate it.
  * @author Jan Materne
  */
+@SuppressWarnings("all")
 public class OptionImpl extends AnnotationImpl implements Option {
     public OptionImpl(ConfigElement ce) throws ClassNotFoundException {
         super(Option.class, ce);
